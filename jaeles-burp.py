@@ -76,21 +76,6 @@ import base64
 import urllib2
 import json
 
-SPECIAL_CHAR = '$$'
-
-
-# Console colors
-W = '\033[1;0m'   # white
-R = '\033[1;31m'  # red
-G = '\033[1;32m'  # green
-O = '\033[1;33m'  # orange
-B = '\033[1;34m'  # blue
-Y = '\033[1;93m'  # yellow
-P = '\033[1;35m'  # purple
-C = '\033[1;36m'  # cyan
-GR = '\033[1;37m'  # gray
-colors = [G, R, B, P, C, O, GR]
-
 
 class BurpExtender(IBurpExtender, ITab, IHttpListener, IContextMenuFactory, IMessageEditorController, AbstractTableModel):
 
@@ -99,6 +84,7 @@ class BurpExtender(IBurpExtender, ITab, IHttpListener, IContextMenuFactory, IMes
     #
 
     def registerExtenderCallbacks(self, callbacks):
+        print("[*] Loading Jaeles beta v0.1")
         # keep a reference to our callbacks object
         self._callbacks = callbacks
 
@@ -123,9 +109,13 @@ class BurpExtender(IBurpExtender, ITab, IHttpListener, IContextMenuFactory, IMes
         _toppane = JPanel()
 
         # top pane
-        self.banner = JLabel("Jaeles Scanner ")
+        self.banner = JLabel("Jaeles - The Swiss Army knife for automated Web Application Testing. ")
         self.banner.setBounds(50, 30, 200, 400)
+
+        self.banner2 = JLabel("Official Documentation: https://jaeles-project.github.io/")
+        self.banner2.setBounds(100, 50, 200, 400)
         _toppane.add(self.banner)
+        _toppane.add(self.banner2)
 
         # _botpane = JPanel()
         _botpane = JSplitPane(JSplitPane.VERTICAL_SPLIT)
@@ -134,23 +124,23 @@ class BurpExtender(IBurpExtender, ITab, IHttpListener, IContextMenuFactory, IMes
         self.HostLabel = JLabel("Jaeles Endpoint: ")
         self.HostLabel.setBounds(100, 150, 200, 400)
 
-        endpoint_pane = JPanel()
-        # end point to submit request
         self.Jaeles_endpoint = 'http://127.0.0.1:5000/api/parse'
-        self.HostText = JTextArea(self.Jaeles_endpoint, 3, 100)
+        self.jwt = 'Jaeles token_here'
+        self.initial()
+        jwt, endpoint = self.get_config()
 
-        # JWT token
-        self.blankLabel = JLabel("\n")
-        self.blankLabel.setBounds(80, 120, 200, 400)
-
-        self.jwtLabel = JLabel("Jaeles JWT token: ")
-        self.jwtLabel.setBounds(100, 150, 200, 400)
-
-        jwt = self.get_config()
+        if endpoint:
+            self.Jaeles_endpoint = endpoint        
         if jwt:
             self.jwt = jwt
-        else:
-            self.jwt = 'Jaeles token_here'
+
+        endpoint_pane = JPanel()
+
+        # end point to submit request
+        self.EndpointText = JTextArea(self.Jaeles_endpoint, 3, 100)
+
+        self.jwtLabel = JLabel("Jaeles JWT token: ")
+        self.jwtLabel.setBounds(100, 300, 250, 450)
 
         self.jwtText = JTextArea(self.jwt, 3, 100, lineWrap=True)
 
@@ -160,7 +150,7 @@ class BurpExtender(IBurpExtender, ITab, IHttpListener, IContextMenuFactory, IMes
         self._saveButton = JButton("Save", actionPerformed=self.saveToken)
         self._loadButton = JButton(
             "Test Connection", actionPerformed=self.butClick)
-        self._clearButton = JButton("Clear", actionPerformed=self.butClick)
+        self._reloadButton = JButton("Reload", actionPerformed=self.butClick)
 
         oob_control = JPanel()
         self.oobLabel = JLabel("OOB: ")
@@ -173,16 +163,16 @@ class BurpExtender(IBurpExtender, ITab, IHttpListener, IContextMenuFactory, IMes
         oob_control.add(self._pollingBox)
 
         # _botpane.add(self.banner)
-        endpoint_pane.add(self.blankLabel)
+        # endpoint_pane.add(self.blankLabel)
         endpoint_pane.add(self.HostLabel)
-        endpoint_pane.add(self.HostText)
+        endpoint_pane.add(self.EndpointText)
         endpoint_pane.add(self.jwtLabel)
         endpoint_pane.add(self.jwtText)
 
         buttons.add(self.buttonLabel)
         buttons.add(self._saveButton)
         buttons.add(self._loadButton)
-        buttons.add(self._clearButton)
+        buttons.add(self._reloadButton)
 
         _botpane.setLeftComponent(oob_control)
         _botpane.setLeftComponent(endpoint_pane)
@@ -219,10 +209,6 @@ class BurpExtender(IBurpExtender, ITab, IHttpListener, IContextMenuFactory, IMes
         # register ourselves as an HTTP listener
         # callbacks.registerHttpListener(self)
         self.print_log("Jaeles Loaded ...")
-
-        # collab = callbacks.createBurpCollaboratorClientContext()
-        # self.jaeles_collab(collab)
-
         return
 
     #
@@ -231,28 +217,30 @@ class BurpExtender(IBurpExtender, ITab, IHttpListener, IContextMenuFactory, IMes
 
     ##
     def saveToken(self, e):
-        self.set_config(self.jwtText.getText().strip())
+        token = self.jwtText.getText().strip()
+        endpoint = self.EndpointText.getText().strip()
+        self.Jaeles_endpoint = endpoint
+        self.jwt = token
+        self.set_config(token, endpoint)
 
     def butClick(self, e):
-        # print(e.getActionCommand())
         button_name = e.getActionCommand()
-        print("{0} Clicked !!!".format(button_name))
 
         if button_name == 'Reload':
-            self.Jaeles_endpoint = self.HostText.getText()
-            print("[+] Reload endpoint to {0}".format(self.Jaeles_endpoint))
+            # self.initial()
+            username, password = self.get_cred()
+            valid_cred = self.login(username, password)
+            jwt, endpoint = self.get_config()
+            self.Jaeles_endpoint = endpoint
+            self.jwt = jwt
+            self.print_log("[+] Reload Config")
 
         elif button_name == 'Test Connection':
-            print(self.Jaeles_endpoint)
-            req = urllib2.Request(self.Jaeles_endpoint)
-            # req.add_header('Content-Type', 'application/json')
-            # print()
-            response = urllib2.urlopen(req)
-            print(response)
-
-            # pass
-
-        # String s = textArea.getText();
+            connection = self.test_connection()
+            if connection:
+                self.print_log("[+] Ready to send request to {0}".format(self.Jaeles_endpoint))
+            else:
+                self.print_log("[-] Fail to authen with API server at {0}".format(self.Jaeles_endpoint))
 
     def createMenuItems(self, invocation):
         responses = invocation.getSelectedMessages()
@@ -319,90 +307,136 @@ class BurpExtender(IBurpExtender, ITab, IHttpListener, IContextMenuFactory, IMes
             self.print_log("-"*30)
 
     # start of my function
-
     def req_parsing(self, messageInfo):
         data_json = {}
-        # request part
-        # requestInfo = self._helpers.analyzeRequest(messageInfo)
-        # print(requestInfo.toString())
         data_json['req_scheme'] = str(messageInfo.getProtocol())  # return http
         data_json['req_host'] = str(messageInfo.getHost())
         data_json['req_port'] = str(messageInfo.getPort())
         data_json['url'] = str(messageInfo.getUrl())
-        # {'req_scheme': 'http', 'req_host': 'testphp.vulnweb.com', 'req_port': '80'}
 
         # full request
         full_req = self._helpers.bytesToString(messageInfo.getRequest())
-        full_res = self._helpers.bytesToString(messageInfo.getResponse())
-
         data_json['req'] = self.just_base64(str(full_req))
-        data_json['res'] = self.just_base64(str(full_res))
+
+        if messageInfo.getResponse():
+            full_res = self._helpers.bytesToString(messageInfo.getResponse())
+        else:
+            full_res = None
+        if not full_res:
+            data_json['res'] = ""
+            return data_json
+
+        data_json['res'] = self.just_base64(str(full_res.encode('utf-8')))
         return data_json
 
+    # send data to Jaeles API Endpoint
     def import_to_Jaeles(self, data_json):
-        # hardcode for now
-        # jurl = 'http://127.0.0.1:8000/Jaeles/api/analyzed/create'
-        # print(self.jwt)
         req = urllib2.Request(self.Jaeles_endpoint)
         req.add_header('Content-Type', 'application/json')
         req.add_header('Authorization', self.jwt)
         self.print_log(req)
         response = urllib2.urlopen(req, json.dumps(data_json))
-        # print(response.read())
-        self.print_log(response.read())
+        if str(response.code) == "200":
+            self.print_log("[+] Send request to {0}".format(self.Jaeles_endpoint))
+        else:
+            self.print_log("[-] Fail Send request to {0}".format(self.Jaeles_endpoint))
 
-    def just_base64(self, text):
-        return str(base64.b64encode(str(text)))
+    # check if token is available or not
+    def initial(self):
+        connection = self.test_connection()
+        if connection:
+            return True
+        username, password = self.get_cred()
+        valid_cred = self.login(username, password)
+        if valid_cred:
+            return True
+        return False
 
-    def just_wrap_char(self, string_in):
-        string_in = self.insert_char(string_in, SPECIAL_CHAR, 0)
-        string_in = self.insert_char(
-            string_in, SPECIAL_CHAR, len(string_in) + 1)
-        return string_in
+    # do login
+    def login(self, username, password):
+        req = urllib2.Request(self.Jaeles_endpoint.replace("/api/parse","/auth/login"))
+        req.add_header('Content-Type', 'application/json')
+        response = urllib2.urlopen(req, json.dumps({"username": username, "password": password}))
 
-    def insert_char(self, string_in, insert_char, index):
-        return string_in[:index] + insert_char + string_in[index:]
+        if str(response.code) == "200":
+            data = json.loads(response.read())
+            token = "Jaeles " + data.get("token")
+            self.set_config(token, self.Jaeles_endpoint, username, password)
+            print("[+] Authentication success on {0}".format(self.Jaeles_endpoint))
+            return True
+        else:
+            print("[-] Can't authen on {0}".format(self.Jaeles_endpoint))
+            return False
 
-    def get_config_path(self):
-        home = os.path.expanduser('~{0}'.format(getpass.getuser()))
-        jaeles_path = os.path.join(home, '.jaeles-burp')
-        config_path = os.path.join(jaeles_path, 'config.json')
-        return config_path
+    # check connection
+    def test_connection(self):
+        req = urllib2.Request(self.Jaeles_endpoint.replace("/parse", "/ping"))
+        req.add_header('Content-Type', 'application/json')
+        req.add_header('Authorization', self.jwt)
+        try:
+            response = urllib2.urlopen(req)
+            if str(response.code) == "200":
+                return True
+        except:
+            pass
+        return False
 
+    # get default credentials
+    def get_cred(self):
+        config_path = self.get_config_path()
+        if os.path.isfile(config_path):
+            with open(config_path, 'r') as f:
+                data = json.load(f)
+            print('[+] Load credentials from {0}'.format(config_path))
+            return data.get('username', False), data.get('password', False)
+        else:
+            print('[-] No config file to load.')
+            return False, False
+
+    # get token and endpoint
     def get_config(self):
         config_path = self.get_config_path()
-
         if os.path.isfile(config_path):
             with open(config_path, 'r') as f:
                 data = json.load(f)
             print('[+] Load JWT from {0}'.format(config_path))
-            return data.get('JWT', False)
-
+            return data.get('JWT', False), data.get('endpoint', False)
         else:
             print('[-] No config file to load.')
-            return False
+            return False, False
 
-    # save jwt token to ~/'jaeles-burp/config.json
-    def set_config(self, jwt):
+    # save jwt token and endpoint to ~/.jaeles/burp.json
+    def set_config(self, token, endpoint, username='', password=''):
         data = {
-            'JWT': jwt,
-            'endpoint': self.Jaeles_endpoint
+            'JWT': token,
+            'endpoint': endpoint,
+            'username': username,
+            'password': password,
         }
         config_path = self.get_config_path()
         jaeles_path = os.path.dirname(config_path)
 
         if jaeles_path and not os.path.exists(jaeles_path):
             os.makedirs(jaeles_path)
-
         with open(config_path, 'w+') as f:
             json.dump(data, f)
 
-        self.print_log('[+] Store JWT in {0}'.format(config_path))
+        print('[+] Store JWT in {0}'.format(config_path))
         return True
+    
+    def just_base64(self, text):
+        if not text:
+            return ""
+        return str(base64.b64encode(str(text)))
+
+    def get_config_path(self):
+        home = os.path.expanduser('~{0}'.format(getpass.getuser()))
+        jaeles_path = os.path.join(home, '.jaeles')
+
+        config_path = os.path.join(jaeles_path, 'burp.json')
+        return config_path
 
     def print_log(self, text):
-        # JTextArea.append(String text).
-        print(text)
         if type(text) != str:
             text = str(text)
         self.log_area.append(text)

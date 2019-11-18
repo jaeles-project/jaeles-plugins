@@ -126,13 +126,16 @@ class BurpExtender(IBurpExtender, ITab, IHttpListener, IContextMenuFactory, IMes
 
         self.Jaeles_endpoint = 'http://127.0.0.1:5000/api/parse'
         self.jwt = 'Jaeles token_here'
-        self.initial()
-        jwt, endpoint = self.get_config()
-
-        if endpoint:
-            self.Jaeles_endpoint = endpoint        
-        if jwt:
-            self.jwt = jwt
+        # just prevent plugin error when you doesn't have server running
+        try:
+            self.initial()
+            jwt, endpoint = self.get_config()
+            if endpoint:
+                self.Jaeles_endpoint = endpoint        
+            if jwt:
+                self.jwt = jwt
+        except:
+            pass
 
         endpoint_pane = JPanel()
 
@@ -229,7 +232,7 @@ class BurpExtender(IBurpExtender, ITab, IHttpListener, IContextMenuFactory, IMes
         if button_name == 'Reload':
             # self.initial()
             username, password = self.get_cred()
-            valid_cred = self.login(username, password)
+            self.login(username, password)
             jwt, endpoint = self.get_config()
             self.Jaeles_endpoint = endpoint
             self.jwt = jwt
@@ -295,7 +298,6 @@ class BurpExtender(IBurpExtender, ITab, IHttpListener, IContextMenuFactory, IMes
     # this allows our request/response viewers to obtain details about the messages being displayed
     #
     def sendRequestToJaeles(self, messageInfos):
-        # just for debug
         for messageInfo in messageInfos:
             data_json = self.req_parsing(messageInfo)
 
@@ -423,7 +425,7 @@ class BurpExtender(IBurpExtender, ITab, IHttpListener, IContextMenuFactory, IMes
 
         print('[+] Store JWT in {0}'.format(config_path))
         return True
-    
+
     def just_base64(self, text):
         if not text:
             return ""

@@ -113,7 +113,11 @@ class BurpExtender(IBurpExtender, ITab, IHttpListener, IContextMenuFactory, IMes
         self.banner.setBounds(50, 30, 200, 400)
 
         self.banner2 = JLabel("Official Documentation: https://jaeles-project.github.io/")
+<<<<<<< HEAD
+        self.banner2.setBounds(100, 30, 200, 400)
+=======
         self.banner2.setBounds(100, 50, 200, 400)
+>>>>>>> 72a014ec6a3d362c8e41fd4a27a3e55094a27335
         _toppane.add(self.banner)
         _toppane.add(self.banner2)
 
@@ -124,6 +128,25 @@ class BurpExtender(IBurpExtender, ITab, IHttpListener, IContextMenuFactory, IMes
         self.HostLabel = JLabel("Jaeles Endpoint: ")
         self.HostLabel.setBounds(100, 150, 200, 400)
 
+<<<<<<< HEAD
+        jwt, endpoint = self.get_config()
+        if endpoint:
+            self.Jaeles_endpoint = endpoint
+        else:
+            self.Jaeles_endpoint = 'http://127.0.0.1:5000/api/parse'
+        endpoint_pane = JPanel()
+
+        # end point to submit request
+        self.EndpointText = JTextArea(self.Jaeles_endpoint, 3, 100)
+
+        self.jwtLabel = JLabel("Jaeles JWT token: ")
+        self.jwtLabel.setBounds(100, 300, 250, 450)
+
+        if jwt:
+            self.jwt = jwt
+        else:
+            self.jwt = 'Jaeles token_here'
+=======
         self.Jaeles_endpoint = 'http://127.0.0.1:5000/api/parse'
         self.jwt = 'Jaeles token_here'
         # just prevent plugin error when you doesn't have server running
@@ -144,6 +167,7 @@ class BurpExtender(IBurpExtender, ITab, IHttpListener, IContextMenuFactory, IMes
 
         self.jwtLabel = JLabel("Jaeles JWT token: ")
         self.jwtLabel.setBounds(100, 300, 250, 450)
+>>>>>>> 72a014ec6a3d362c8e41fd4a27a3e55094a27335
 
         self.jwtText = JTextArea(self.jwt, 3, 100, lineWrap=True)
 
@@ -239,8 +263,16 @@ class BurpExtender(IBurpExtender, ITab, IHttpListener, IContextMenuFactory, IMes
             self.print_log("[+] Reload Config")
 
         elif button_name == 'Test Connection':
+<<<<<<< HEAD
+            req = urllib2.Request(self.Jaeles_endpoint.replace("/parse", "/ping"))
+            req.add_header('Content-Type', 'application/json')
+            req.add_header('Authorization', self.jwt)
+            response = urllib2.urlopen(req)
+            if str(response.code) == "200":
+=======
             connection = self.test_connection()
             if connection:
+>>>>>>> 72a014ec6a3d362c8e41fd4a27a3e55094a27335
                 self.print_log("[+] Ready to send request to {0}".format(self.Jaeles_endpoint))
             else:
                 self.print_log("[-] Fail to authen with API server at {0}".format(self.Jaeles_endpoint))
@@ -341,6 +373,20 @@ class BurpExtender(IBurpExtender, ITab, IHttpListener, IContextMenuFactory, IMes
             self.print_log("[+] Start scan {0}".format(data_json['url']))
         else:
             self.print_log("[-] Fail Send request to {0}".format(self.Jaeles_endpoint))
+<<<<<<< HEAD
+            self.print_log(response.read())
+
+    def just_base64(self, text):
+        if not text:
+            return ""
+        return str(base64.b64encode(str(text)))
+
+    def get_config_path(self):
+        home = os.path.expanduser('~{0}'.format(getpass.getuser()))
+        jaeles_path = os.path.join(home, '.jaeles-burp')
+        config_path = os.path.join(jaeles_path, 'config.json')
+        return config_path
+=======
 
     # check if token is available or not
     def initial(self):
@@ -393,6 +439,7 @@ class BurpExtender(IBurpExtender, ITab, IHttpListener, IContextMenuFactory, IMes
         else:
             print('[-] No config file to load.')
             return False, False
+>>>>>>> 72a014ec6a3d362c8e41fd4a27a3e55094a27335
 
     # get token and endpoint
     def get_config(self):
@@ -402,10 +449,21 @@ class BurpExtender(IBurpExtender, ITab, IHttpListener, IContextMenuFactory, IMes
                 data = json.load(f)
             print('[+] Load JWT from {0}'.format(config_path))
             return data.get('JWT', False), data.get('endpoint', False)
+<<<<<<< HEAD
+
+=======
+>>>>>>> 72a014ec6a3d362c8e41fd4a27a3e55094a27335
         else:
             print('[-] No config file to load.')
             return False, False
 
+<<<<<<< HEAD
+    # save jwt token and endpoint to ~/jaeles-burp/config.json
+    def set_config(self, token, endpoint):
+        data = {
+            'JWT': token,
+            'endpoint': endpoint
+=======
     # save jwt token and endpoint to ~/.jaeles/burp.json
     def set_config(self, token, endpoint, username='', password=''):
         data = {
@@ -413,6 +471,7 @@ class BurpExtender(IBurpExtender, ITab, IHttpListener, IContextMenuFactory, IMes
             'endpoint': endpoint,
             'username': username,
             'password': password,
+>>>>>>> 72a014ec6a3d362c8e41fd4a27a3e55094a27335
         }
         config_path = self.get_config_path()
         jaeles_path = os.path.dirname(config_path)

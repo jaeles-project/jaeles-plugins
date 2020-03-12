@@ -211,7 +211,7 @@ class BurpExtender(IBurpExtender, ITab, IHttpListener, IContextMenuFactory, IMes
 
         # register ourselves as an HTTP listener
         # callbacks.registerHttpListener(self)
-        self.print_log("Jaeles Loaded ...")
+        self.print_log("[*] Jaeles Loaded ...")
         return
 
     #
@@ -336,10 +336,9 @@ class BurpExtender(IBurpExtender, ITab, IHttpListener, IContextMenuFactory, IMes
         req = urllib2.Request(self.Jaeles_endpoint)
         req.add_header('Content-Type', 'application/json')
         req.add_header('Authorization', self.jwt)
-        self.print_log(req)
         response = urllib2.urlopen(req, json.dumps(data_json))
         if str(response.code) == "200":
-            self.print_log("[+] Send request to {0}".format(self.Jaeles_endpoint))
+            self.print_log("[+] Start scan {0}".format(data_json['url']))
         else:
             self.print_log("[-] Fail Send request to {0}".format(self.Jaeles_endpoint))
 

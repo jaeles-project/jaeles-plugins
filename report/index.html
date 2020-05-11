@@ -52,7 +52,7 @@
         <div class="col-12">
           <table
             id="report"
-            class="table table-hover responsive nowrap"
+            class="table table-hover responsive wrap"
             style="width: 100%;"
           >
             <thead>
@@ -177,11 +177,11 @@
     <script src="https://cdn.datatables.net/1.10.19/js/dataTables.bootstrap4.min.js"></script>
     <script>
       $(document).ready(function () {
-        $('#report').DataTable({
+        $("#report").DataTable({
           pageLength: 100,
           lengthMenu: [
             [50, 100, 1000, -1],
-            [50, 100, 1000, 'All'],
+            [50, 100, 1000, "All"],
           ],
           aaSorting: [],
           responsive: true,
@@ -198,11 +198,11 @@
           ],
         });
 
-        $('.dataTables_filter input')
-          .attr('placeholder', 'Text to search...')
+        $(".dataTables_filter input")
+          .attr("placeholder", "Text to search...")
           .css({
-            width: '300px',
-            display: 'inline-block',
+            width: "300px",
+            display: "inline-block",
           });
 
         $('[data-toggle="tooltip"]').tooltip();
@@ -288,14 +288,18 @@
         background-color: #c8d9f1;
         color: #467fcf;
       }
+      table.dataTable tbody td {
+        word-break: break-word;
+        vertical-align: top;
+      }
 
       table.dataTable.dtr-inline.collapsed
         > tbody
-        > tr[role='row']
+        > tr[role="row"]
         > td:first-child:before,
       table.dataTable.dtr-inline.collapsed
         > tbody
-        > tr[role='row']
+        > tr[role="row"]
         > th:first-child:before {
         top: 28px;
         left: 14px;
@@ -305,11 +309,11 @@
 
       table.dataTable.dtr-inline.collapsed
         > tbody
-        > tr[role='row']
+        > tr[role="row"]
         > td:first-child,
       table.dataTable.dtr-inline.collapsed
         > tbody
-        > tr[role='row']
+        > tr[role="row"]
         > th:first-child {
         padding-left: 48px;
       }

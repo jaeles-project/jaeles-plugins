@@ -3,7 +3,7 @@
   <img alt="Osmedeus" src="https://image.flaticon.com/icons/svg/1432/1432425.svg" height="140" />
   <p align="center">
     <a href=""><img alt="Software License" src="https://img.shields.io/badge/license-MIT-brightgreen.svg?style=flat-square"></a>
-    <a href="https://github.com/j3ssie/Osmedeus"><img alt="Release" src="https://img.shields.io/badge/version-beta%20v0.1-red.svg"></a>
+    <a href="https://github.com/jaeles-project/jaeles"><img alt="Release" src="https://img.shields.io/github/v/release/jaeles-project/jaeles.svg"></a>
   </p>
 </p>
 

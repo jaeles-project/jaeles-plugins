@@ -37,6 +37,7 @@
             height="100"
           />
           <br />
+          <br />
           <h4 class="text-title">
             <a class="text-title" href="out/jaeles-summary.txt">{{.Title}}</a>
           </h4>
@@ -55,6 +56,7 @@
           >
             <thead>
               <tr>
+                <th>Confidence</th>
                 <th>Risk</th>
                 <th>URL</th>
                 <th>Signature name</th>
@@ -70,7 +72,11 @@
                     {{.Risk}}
                   </div>
                 </td>
-
+                <td>
+                  <div class="badge badge-{{.Confidence}}">
+                    {{.Confidence}}
+                  </div>
+                </td>
                 <td>
                   <a class="text-primary" target="_blank" href="{{.URL}}">
                     <svg
@@ -179,23 +185,22 @@
     </div>
 
     <!-- static data -->
-    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.5.1.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.3.1/js/bootstrap.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/datatables/1.10.19/js/jquery.dataTables.min.js"></script>
-    <script src="https://cdn.datatables.net/responsive/2.2.3/js/dataTables.responsive.min.js"></script>
+    <script src="https://cdn.datatables.net/1.10.21/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/colreorder/1.5.2/js/dataTables.colReorder.min.js"></script>
     <script src="https://cdn.datatables.net/1.10.19/js/dataTables.bootstrap4.min.js"></script>
     <script>
       $(document).ready(function () {
         $("#report").DataTable({
-          pageLength: 100,
+          pageLength: 50,
           lengthMenu: [
-            [50, 100, 1000, -1],
-            [50, 100, 1000, "All"],
+            [25, 50, 100, 1000, -1],
+            [25, 50, 100, 1000, "All"],
           ],
           aaSorting: [],
           responsive: true,
-
           columnDefs: [
             {
               responsivePriority: 1,
@@ -382,6 +387,21 @@
         padding: 0.5em 0.75em;
       }
 
+      .badge-Tentative {
+        background-color: #d6dbdf;
+        color: #2c3e50;
+      }
+
+      .badge-Firm {
+        background-color: #5d6d7e;
+        color: #f8f9f9;
+      }
+
+      .badge-Certain {
+        background-color: #212f3c;
+        color: #f8f9f9;
+      }
+
       .badge-success-alt {
         background-color: #d7f2c2;
         color: #7bd235;
@@ -392,12 +412,26 @@
         color: #7b241c;
       }
 
+      .badge-Critical {
+        background-color: #f5b7b1;
+        color: #7b241c;
+      }
+
       .badge-high {
         background-color: #fcd3e1;
         color: #e74c3c;
       }
 
+      .badge-High {
+        background-color: #fcd3e1;
+        color: #e74c3c;
+      }
+
       .badge-medium {
+        background-color: #fcf3cf;
+        color: #f1c40f;
+      }
+      .badge-Medium {
         background-color: #fcf3cf;
         color: #f1c40f;
       }
@@ -407,12 +441,27 @@
         color: #2ecc71;
       }
 
+      .badge-Low {
+        background-color: #abebc6;
+        color: #2ecc71;
+      }
+
       .badge-info {
         background-color: #c8d9f1;
         color: #467fcf;
       }
 
+      .badge-Info {
+        background-color: #c8d9f1;
+        color: #467fcf;
+      }
+
       .badge-potential {
+        background-color: #d7bde2;
+        color: #6c3483;
+      }
+
+      .badge-Potential {
         background-color: #d7bde2;
         color: #6c3483;
       }

@@ -68,13 +68,13 @@
               {{range .Vulnerabilities}}
               <tr>
                 <td>
-                  <div class="badge badge-{{.Risk}}">
-                    {{.Risk}}
+                  <div class="badge badge-{{.Confidence}}">
+                    {{.Confidence}}
                   </div>
                 </td>
                 <td>
-                  <div class="badge badge-{{.Confidence}}">
-                    {{.Confidence}}
+                  <div class="badge badge-{{.Risk}}">
+                    {{.Risk}}
                   </div>
                 </td>
                 <td>
